@@ -18,8 +18,8 @@ describe('app routes', () => {
       const signInData = await fakeRequest(app)
         .post('/auth/signup')
         .send({
-          email: 'jon@user.com',
-          password: '1234'
+          email: 'bob@loblaw.com',
+          password: 'lawblog'
         });
       
       token = signInData.body.token; // eslint-disable-line
@@ -31,35 +31,73 @@ describe('app routes', () => {
       return client.end(done);
     });
 
-    test('returns animals', async() => {
+    test('creates a new todo for owner 3', async() => {
+      const newTodo = {
+        'todo': 'wash the car',
+        'completed': false,
+        'owner_id': 3
+      };
 
-      const expectation = [
+      const dbTodo = [
         {
-          'id': 1,
-          'name': 'bessie',
-          'coolfactor': 3,
-          'owner_id': 1
-        },
-        {
-          'id': 2,
-          'name': 'jumpy',
-          'coolfactor': 4,
-          'owner_id': 1
-        },
-        {
-          'id': 3,
-          'name': 'spot',
-          'coolfactor': 10,
-          'owner_id': 1
+          ...newTodo,
+          id: 7,
         }
       ];
 
       const data = await fakeRequest(app)
-        .get('/animals')
+        .post('/api/todos')
+        .send(newTodo)
+        .set('Authorization', token)
         .expect('Content-Type', /json/)
         .expect(200);
 
-      expect(data.body).toEqual(expectation);
+      expect(data.body).toEqual(dbTodo);
     });
+    
+    test('returns todos for owner 3', async() => {
+
+      const userTodos = [
+        {
+          'id': 7,
+          'todo': 'wash the car',
+          'completed': false,
+          'owner_id': 3
+        }
+      ];
+
+      const data = await fakeRequest(app)
+        .get('/api/todos')
+        .set('Authorization', token)
+        .expect('Content-Type', /json/)
+        .expect(200);
+
+      expect(data.body).toEqual(userTodos);
+    });
+
+    test.skip('updates a todo to completed: true', async() => {
+
+      const updatedTodo = {
+        'todo': 'wash the car',
+        'completed': true,
+        'owner_id': 3
+      };
+
+      await fakeRequest(app)
+        .put('/api/todos/7')
+        .send(updatedTodo)
+        .set('Authorization', token)
+        .expect('Content-Type', /json/);
+      // .expect(200);
+      
+      const newData = await fakeRequest(app)
+        .get('/api/todos/7')
+        .set('Authorization', token)
+        .expect('Content-Type', /json/)
+        .expect(200);
+
+      expect(newData.body).toEqual(updatedTodo);
+    });
+
   });
 });
