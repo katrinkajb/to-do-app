@@ -75,28 +75,27 @@ describe('app routes', () => {
       expect(data.body).toEqual(userTodos);
     });
 
-    test.skip('updates a todo to completed: true', async() => {
+    test('updates a todo to completed: true', async() => {
 
       const updatedTodo = {
         'todo': 'wash the car',
         'completed': true,
-        'owner_id': 3
       };
 
       await fakeRequest(app)
         .put('/api/todos/7')
         .send(updatedTodo)
         .set('Authorization', token)
-        .expect('Content-Type', /json/);
-      // .expect(200);
+        .expect('Content-Type', /json/)
+        .expect(200);
       
       const newData = await fakeRequest(app)
-        .get('/api/todos/7')
+        .get('/api/todos')
         .set('Authorization', token)
         .expect('Content-Type', /json/)
         .expect(200);
 
-      expect(newData.body).toEqual(updatedTodo);
+      expect(newData.body[0]).toEqual({ ...updatedTodo, id: 7, owner_id: 3 });
     });
 
   });
