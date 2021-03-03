@@ -78,7 +78,6 @@ describe('app routes', () => {
     test('updates a todo to completed: true', async() => {
 
       const updatedTodo = {
-        'todo': 'wash the car',
         'completed': true,
       };
 
@@ -95,7 +94,7 @@ describe('app routes', () => {
         .expect('Content-Type', /json/)
         .expect(200);
 
-      expect(newData.body[0]).toEqual({ ...updatedTodo, id: 7, owner_id: 3 });
+      expect(newData.body[0]).toEqual({ ...updatedTodo, todo: 'wash the car', id: 7, owner_id: 3 });
     });
 
   });
